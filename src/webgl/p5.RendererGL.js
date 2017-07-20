@@ -59,6 +59,8 @@ p5.RendererGL = function(elt, pInst, isMainCanvas) {
 
   this.curShader = null;
 
+  this.emptyTexture = null;
+
   return this;
 };
 
@@ -224,8 +226,7 @@ function(vertId, fragId, isImmediateMode) {
 
   //END SHADERS SETUP
 
-  //This happens automatically in the above step
-  //this._getLocation(shaderProgram, isImmediateMode);
+  this._createEmptyTexture();
 
   return shaderProgram;
 };
