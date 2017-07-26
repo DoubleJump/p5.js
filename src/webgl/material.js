@@ -130,10 +130,22 @@ p5.prototype.texture = function(){
   var shaderProgram = renderer._getShader('lightVert',
     'lightTextureFrag');
   renderer._useShader(shaderProgram);
+  renderer._setUniform('uSpecular', false);
+  
   var textureData;
-  shaderProgram.uSpecular = gl.getUniformLocation(
-    shaderProgram, 'uSpecular' );
-  gl.uniform1i(shaderProgram.uSpecular, false);
+  var sampler = renderer.defaultSampler;
+  if(args.length > 0){
+    if(args[1] instanceof p5.Sampler){
+      sampler = args[1];
+    }
+    if(args[1] === 'sprite'){
+      sampler = renderer.pointSampler;
+    }
+    else if(args[1] === 'repeat'){
+      sampler = renderer.repeatSampler;
+    }
+  }
+  
   //if argument is not already a texture
   //create a new one
   if(!args[0].isTexture){
@@ -153,7 +165,8 @@ p5.prototype.texture = function(){
     var tex = gl.createTexture();
     args[0]._setProperty('tex', tex);
     args[0]._setProperty('isTexture', true);
-    renderer._bind.call(this, tex, textureData);
+    //renderer._bind.call(this, tex, textureData, sampler);
+    renderer._bind(tex, textureData, sampler);
   }
   else {
     if(args[0] instanceof p5.Graphics ||
@@ -164,7 +177,8 @@ p5.prototype.texture = function(){
     else if(args[0] instanceof p5.Image){
       textureData = args[0].canvas;
     }
-    renderer._bind.call(this, args[0].tex, textureData);
+    renderer._bind(args[0].tex, textureData, sampler);
+    //renderer._bind.call(this, args[0].tex, textureData, sampler);
   }
 
   //this is where we'd activate multi textures
@@ -178,21 +192,42 @@ p5.prototype.texture = function(){
 /**
  * Texture Util functions
  */
-p5.RendererGL.prototype._bind = function(tex, data){
-  var gl = this._renderer.GL;
+p5.RendererGL.prototype._convertFilter = function(mode){
+  var gl = this.GL;
+  if(mode === 'smooth') return gl.LINEAR;
+  if(mode === 'sharp') return gl.NEAREST;
+  return gl.LINEAR; //@todo warning instead?
+}
+
+p5.RendererGL.prototype._convertWrapMode = function(mode){
+  var gl = this.GL;
+  if(mode === 'clamp') return gl.CLAMP_TO_EDGE;
+  if(mode === 'repeat') return gl.REPEAT;
+  return gl.CLAMP_TO_EDGE; //@todo warning instead?
+}
+
+p5.RendererGL.prototype._bind = function(tex, data, sampler){
+  var gl = this.GL;
   gl.bindTexture(gl.TEXTURE_2D, tex);
   gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
   gl.texImage2D(gl.TEXTURE_2D, 0,
     gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, data);
-  gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
+  
+  var minFilter = this._convertFilter(sampler.minFilter);
+  var magFilter = this._convertFilter(sampler.magFilter);
+  var wrapX = this._convertWrapMode(sampler.wrapX);
+  var wrapY = this._convertWrapMode(sampler.wrapY);
+
+  var gl = this.GL;
   gl.texParameteri(gl.TEXTURE_2D,
-  gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+  gl.TEXTURE_MAG_FILTER, magFilter);
   gl.texParameteri(gl.TEXTURE_2D,
-  gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+  gl.TEXTURE_MIN_FILTER, minFilter);
   gl.texParameteri(gl.TEXTURE_2D,
-  gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+  gl.TEXTURE_WRAP_S, wrapX);
   gl.texParameteri(gl.TEXTURE_2D,
-  gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+  gl.TEXTURE_WRAP_T, wrapY);
+
   gl.bindTexture(gl.TEXTURE_2D, null);
 };
 

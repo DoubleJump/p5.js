@@ -4,6 +4,7 @@ var p5 = require('../core/core');
 var shader = require('./shader');
 require('../core/p5.Renderer');
 require('./p5.Matrix');
+require('./sampler');
 var uMVMatrixStack = [];
 
 //@TODO should implement public method
@@ -58,6 +59,14 @@ p5.RendererGL = function(elt, pInst, isMainCanvas) {
   this.pointSize = 5.0;//default point/stroke
 
   this.curShader = null;
+  this.pointSampler = 
+    new p5.Sampler('SHARP', 'SHARP', 'CLAMP', 'CLAMP');
+
+  this.repeatSampler = 
+    new p5.Sampler('SMOOTH', 'SMOOTH', 'REPEAT', 'REPEAT');
+
+  this.defaultSampler = 
+    new p5.Sampler('SMOOTH', 'SMOOTH', 'CLAMP', 'CLAMP');
 
   this.emptyTexture = null;
 

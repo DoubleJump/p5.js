@@ -186,6 +186,10 @@ module.exports = {
   DODGE: 'color-dodge',
   BURN: 'color-burn',
 
+  // WEBGL TEXTURE FILTERS
+  SPRITE: 'sprite',
+  SMOOTH: 'smooth',
+
   // FILTERS
   THRESHOLD: 'threshold',
   GRAY: 'gray',
