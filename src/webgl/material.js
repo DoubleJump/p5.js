@@ -296,7 +296,6 @@ p5.prototype.ambientMaterial = function(v1, v2, v3, a) {
   this._renderer._setUniform('uMaterialColor', colors);
   this._renderer._setUniform('uSpecular', false);
   this._renderer._setUniform('isTexture', false);
-
   return this;
 };
 
@@ -352,7 +351,6 @@ p5.prototype.specularMaterial = function(v1, v2, v3, a) {
   this._renderer._setUniform('uMaterialColor', colors);
   this._renderer._setUniform('uSpecular', true);
   this._renderer._setUniform('isTexture', false);
-
   return this;
 };
 

@@ -58,6 +58,7 @@ p5.RendererGL = function(elt, pInst, isMainCanvas) {
   this.curStrokeColor = [0.5,0.5,0.5,1.0];
   this.pointSize = 5.0;//default point/stroke
 
+  this.emptyTexture = null;
   this.curShader = null;
   this.pointSampler = 
     new p5.Sampler('SHARP', 'SHARP', 'CLAMP', 'CLAMP');
@@ -234,7 +235,6 @@ function(vertId, fragId, isImmediateMode) {
   }
 
   //END SHADERS SETUP
-
   this._createEmptyTexture();
 
   return shaderProgram;
